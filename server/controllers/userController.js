@@ -1,6 +1,8 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/token");
+const { findById } = require("../models/menuItem");
+const cloudinaryInstance = require("../config/cloudinary");
 const userSignup = async (req, res) => {
   try {
     const { name, email, password, mobile, role } = req.body;
@@ -134,6 +136,10 @@ const userUpdateprofile = async (req, res) => {
     if (name) profile.name = name;
     if (email) profile.email = email;
     if (mobile) profile.mobile = mobile;
+    if (req.file) {
+      const imageUri = await cloudinaryInstance.uploader.upload(req.file.path);
+      profile.profilePic = imageUri.url;
+    }
     const profileupdated = await profile.save();
     res.status(200).json({
       message: "User profile updated successfully",

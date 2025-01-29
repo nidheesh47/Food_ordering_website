@@ -1,16 +1,19 @@
 const express = require("express");
 const app = express();
-const cookieParser = require("cookie-parser");
-const apiRouter = require("./routes");
 
+const apiRouter = require("./routes");
+const cookieParser = require("cookie-parser");
 const { PORT, connectDB } = require("./config/db");
 
 const port = PORT;
 const db = connectDB;
 
 db();
+
 app.use(cookieParser());
+
 cookieParser();
+
 app.use(express.json());
 
 app.get("/", (req, res) => {

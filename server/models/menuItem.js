@@ -12,6 +12,10 @@ const menuItemSchema = new mongoose.Schema({
     required: [true, "Price is required"],
   },
   image: String,
+  isAvailable: {
+    type: Boolean,
+    default: true,
+  },
   restaurant: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Restaurant",

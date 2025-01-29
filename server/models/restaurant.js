@@ -5,6 +5,7 @@ const restaurantSchema = new mongoose.Schema({
   location: { type: String, required: true },
   phone: { type: String, required: true, minLength: 10 },
   cuisine: { type: String },
+  isOpen: { type: Boolean, default: true },
   image: { type: String },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   menu: [{ type: mongoose.Schema.Types.ObjectId, ref: "MenuItem" }], // Reference to MenuItem model
