@@ -100,7 +100,8 @@ const getAddresses = async (req, res) => {
     if (!userId) {
       return res.status(400).json({ message: "user Id is not found" });
     }
-    const address = await Address.find({ user: userId }).populate("user");
+    const user = await User.findById(userId);
+    const address = await Address.find({ user: user });
     if (!address) {
       return res.status(404).json({ message: "address is not found" });
     }

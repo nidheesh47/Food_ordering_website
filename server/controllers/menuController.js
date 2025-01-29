@@ -119,7 +119,7 @@ const deleteMenuItem = async (req, res) => {
   }
 };
 
-const getAllMenuItems = async (req, res) => {
+const getAllMenuItemsOfRestaurant = async (req, res) => {
   try {
     const { restaurantId } = req.params;
     const menuItems = await MenuItem.find({ restaurant: restaurantId });
@@ -181,11 +181,25 @@ const getMenuByName = async (req, res) => {
   }
 };
 
+const getAllMenuItems = async (req, res) => {
+  try {
+    const menu = await MenuItem.find();
+    if (!menu || menu.length === 0) {
+      res.status(404).json({ message: "No menuitems found" });
+    }
+    res.status(200).json({ message: "Found all menu items", menu });
+  } catch (error) {
+    console.error("Error fetching all menu items:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createMenuItem,
   updateMenuItem,
   deleteMenuItem,
-  getAllMenuItems,
+  getAllMenuItemsOfRestaurant,
   getMenuItem,
   getMenuByName,
+  getAllMenuItems,
 };

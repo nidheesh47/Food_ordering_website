@@ -11,7 +11,7 @@ const router = express.Router();
 router.post("/add", Auth, addAddress);
 router.get("/:addressId", Auth, getAddress);
 router.put("/:addressId/update", Auth, editeAddress);
-router.get("/:userId/addresses", Auth, getAddresses);
+router.get("/all/addresses", Auth, getAddresses);
 router.delete("/:addressId/delete", Auth, deleteAddress);
 const addressRouter = router;
 module.exports = addressRouter;
