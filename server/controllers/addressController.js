@@ -81,7 +81,7 @@ const getAddress = async (req, res) => {
     if (!addressId) {
       return res.status(400).json({ message: "address Id is not found" });
     }
-    const findAddress = await Address.findById(addressId).populate("user");
+    const findAddress = await Address.findById(addressId);
     if (!findAddress) {
       return res.status(404).json({ message: "address is not found" });
     }
@@ -130,7 +130,7 @@ const deleteAddress = async (req, res) => {
     if (!address) {
       return res.status(404).json({ message: "address is not found " });
     }
-    res.status(200).json({ message: "address item delete successfully" });
+    res.status(200).json({ message: "address delete successfully" });
   } catch (error) {
     {
       console.error("Error deleting menu item:", error);

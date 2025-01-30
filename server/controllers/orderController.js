@@ -110,10 +110,6 @@ const updateStatus = async (req, res) => {
 
 const deleteOrder = async (req, res) => {
   try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({ message: "User is not Authorized" });
-    }
     const { orderId } = req.params;
     const order = await Order.findByIdAndDelete(orderId);
     if (!order) {

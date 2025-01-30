@@ -4,16 +4,12 @@ const Restauarnt = require("../models/restaurant");
 const User = require("../models/user");
 
 const addToCart = async (req, res) => {
-  const { userId, restaurantId, foodId, quantity } = req.body;
+  const { restaurantId, foodId, quantity } = req.body;
 
   try {
-    const user = await User.findById(req.user.id);
-    const role = req.user.role;
-    if (!user || role !== "user") {
-      return res.status(401).json({ message: "Unauthorized user" });
-    }
-    // Check if the user already has a cart
-    let cart = await Cart.findOne({ userId });
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    let cart = await Cart.findOne({ user });
 
     // If the cart exists and it's from a different restaurant
     if (cart && cart.restaurantId.toString() !== restaurantId) {
@@ -35,7 +31,7 @@ const addToCart = async (req, res) => {
     if (!cart) {
       // Create a new cart
       cart = new Cart({
-        userId,
+        userId: user,
         restaurantId,
         items: [{ foodId, quantity, totalItemPrice }],
         totalPrice: totalItemPrice,
@@ -63,7 +59,6 @@ const addToCart = async (req, res) => {
 
     await cart.save();
     const populatedCart = await Cart.findById(cart._id)
-      .populate("userId", "name") // Populate user details (name)
       .populate("items.foodId", "title price") // Populate food details like name and price
       .populate("restaurantId", "name location");
     res.status(200).json({ cart: populatedCart });
@@ -73,16 +68,13 @@ const addToCart = async (req, res) => {
 };
 
 const changeItemQuantity = async (req, res) => {
-  const { userId, foodId, action } = req.body;
+  const { foodId, action } = req.body;
 
   try {
-    const user = await User.findById(req.user.id);
-    const role = req.user.role;
-    if (!user || role !== "user") {
-      return res.status(401).json({ message: "Unauthorized user" });
-    }
+    const userId = req.user.id;
+
     // Check if all required fields are present
-    if (!userId || !foodId || !action) {
+    if (!foodId || !action) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
