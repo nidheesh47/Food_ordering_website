@@ -1,25 +1,24 @@
 import React from "react";
-import { Rating } from "@material-tailwind/react";
 
-function RestaurantCard({ name, image, rating }) {
+const RestaurantCard = ({ name, image, rating, isOpen }) => {
   return (
-    <div className="rounded overflow-hidden shadow-lg max-w-xs mx-auto sm:max-w-sm md:max-w-md lg:max-w-lg">
-      <div className="relative">
-        <img
-          className="w-full h-56 object-cover sm:h-64 md:h-40 lg:h-40"
-          src={image}
-          alt={name}
-        />
-        <div className="hover:bg-transparent transition duration-300 absolute inset-0 bg-gray-900 opacity-25"></div>
-      </div>
-      <div className="px-4 py-3">
-        <Rating value={rating} readonly />
-        <h3 className="font-semibold text-base md:text-lg lg:text-xl">
-          {name}
-        </h3>
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+      <img src={image} alt={name} className="w-full h-48 object-cover" />
+      <div className="p-4">
+        <h3 className="text-xl font-semibold mb-2">{name}</h3>
+        <div className="flex items-center justify-between">
+          <span className="text-yellow-500">⭐ {rating}</span>
+          <span
+            className={`px-2 py-1 rounded-full text-sm font-semibold ${
+              isOpen ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
+          >
+            {isOpen ? "Open Now" : "Closed"}
+          </span>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default RestaurantCard;

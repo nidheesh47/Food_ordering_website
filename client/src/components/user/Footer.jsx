@@ -25,10 +25,10 @@ function Footer() {
   const currentYear = new Date().getFullYear();
   return (
     <div>
-      <footer className="relative w-full pt-10 bg-gray-800 text-white">
+      <footer className="relative w-full pt-10 bg-yellow-900 text-white">
         <div className="mx-auto w-full max-w-7xl px-8">
           <div className="grid grid-cols-1 justify-between gap-4 md:grid-cols-2">
-            <Typography variant="h5" className="mb-6 text-teal-400">
+            <Typography variant="h5" className="mb-6 text-white">
               Fryomi
             </Typography>
             <div className="grid grid-cols-3 justify-between gap-4">
@@ -46,8 +46,8 @@ function Footer() {
                       <Typography
                         as={link === "About Us" ? Link : "a"} // Use Link for About Us
                         to={link === "About Us" ? "/about" : "#"} // Link to /about
-                        color="teal"
-                        className="py-1.5 font-normal hover:text-teal-300"
+                        color="white"
+                        className="py-1.5 font-normal"
                       >
                         {link}
                       </Typography>
@@ -63,10 +63,7 @@ function Footer() {
               className="mb-4 text-center font-medium text-white md:mb-0"
             >
               &copy; {currentYear}{" "}
-              <a
-                href="https://material-tailwind.com/"
-                className="text-teal-400"
-              >
+              <a href="https://material-tailwind.com/" className="text-white">
                 Fryomi
               </a>
               . All Rights Reserved.

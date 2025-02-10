@@ -1,69 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import RestaurantCard from "../restaurant/RestaurantCard";
 import { Carousel } from "@material-tailwind/react";
 import SliderItem from "./SliderItem";
 import MultiSlider from "./MultiSlider";
+import { axiosInstance } from "../../config/axioInstance";
+import { Link } from "react-router-dom";
 
 function HomePage() {
-  const data = [
-    {
-      name: "PizzaHut",
-      image: "/pizza.png",
-      rating: 4,
-    },
-    {
-      name: "Moonlight",
-      image: "/pizza.png",
-      rating: 4,
-    },
-    {
-      name: "Domino's",
-      image: "/pizza.png",
-      rating: 4,
-    },
-    {
-      name: "Rainbow",
-      image: "/pizza.png",
-      rating: 4,
-    },
-    {
-      name: "Salt&pepper",
-      image: "/pizza.png",
-      rating: 4,
-    },
-  ];
-  const carouselData = [
-    {
-      image: "/pizza.png",
-      name: "Pizza",
-    },
-    {
-      image: "/pizza.png",
-      name: "Pasta",
-    },
-    {
-      image: "/pizza.png",
-      name: "Burger",
-    },
-    {
-      image: "/pizza.png",
-      name: "Salad",
-    },
-    {
-      image: "/pizza.png",
-      name: "Sushi",
-    },
-    {
-      image: "/pizza.png",
-      name: "Steak",
-    },
-    {
-      image: "/pizza.png",
-      name: "Tacos",
-    },
-  ];
+  const [carouselData, setCarouselData] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  var settings = {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [menuResponse, restaurantResponse] = await Promise.all([
+          axiosInstance({ url: "menu-item/get/all/menu-items" }),
+          axiosInstance({ url: "/restaurant/all" }),
+        ]);
+
+        // Map menu items to include restaurantId
+        const menuItems = menuResponse.data.menu.map((item) => ({
+          image: item.image,
+          name: item.title,
+          restaurantId: item.restaurant, // Assuming the menu item has a restaurant field
+        }));
+        setCarouselData(menuItems);
+
+        setRestaurants(restaurantResponse.data.allRestaurants);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredRestaurants = restaurants.filter((restaurant) =>
+    restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const settings = {
     dots: true,
     infinite: true,
     speed: 500,
@@ -74,8 +54,13 @@ function HomePage() {
     navigation: true,
   };
 
+  if (loading) {
+    return <div className="text-center py-8">Loading...</div>;
+  }
+
   return (
     <>
+      {/* Search Bar Section */}
       <div className="searchbar-img justify-center flex items-center relative">
         <div className="flex flex-col items-center">
           <div className="text-center text-white">
@@ -91,11 +76,13 @@ function HomePage() {
             className="mx-auto relative bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-2xl gap-2 shadow-2xl focus-within:border-gray-300"
             htmlFor="search-bar"
           >
-            {/* Search */}
             <input
               id="search-bar"
               placeholder="your keyword here"
               className="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search for restaurants or dishes"
             />
             <button className="w-full md:w-auto px-6 py-3 bg-yellow-900 text-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all disabled:opacity-70">
               <div className="relative">
@@ -132,33 +119,58 @@ function HomePage() {
         </div>
       </div>
 
-      <h1 className="roboto text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-4 max-w-screen-xl mx-auto">
-        Taste the first bite
-      </h1>
-
-      {/* MultiSlider Carousel */}
-      <div className="px-4 sm:px-6 lg:px-8 py-6 lg:py-12 max-w-screen-xl mx-auto">
-        <MultiSlider
-          data={carouselData}
-          settings={settings}
-          items={(item) => (
-            <SliderItem key={item.name} img={item.image} name={item.name} />
+      {/* Carousel Section */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-8">
+          Popular Dishes
+        </h2>
+        <div className="px-4 sm:px-6 lg:px-8">
+          {carouselData.length === 0 ? (
+            <p className="text-center text-gray-500">
+              No menu items available.
+            </p>
+          ) : (
+            <MultiSlider
+              data={carouselData}
+              settings={settings}
+              items={(item) => (
+                <Link
+                  key={item.name}
+                  to={`/restaurant/${item.restaurantId}`} // Navigate to the restaurant page
+                >
+                  <SliderItem
+                    img={item.image}
+                    name={item.name}
+                    alt={`Image of ${item.name}`}
+                  />
+                </Link>
+              )}
+            />
           )}
-        />
+        </div>
       </div>
 
-      {/* Restaurant Cards */}
-      <div className="max-w-screen-xl mx-auto p-5 sm:p-10 md:p-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-          {data.map((restaurant) => (
-            <RestaurantCard
-              key={restaurant.name} // Use a unique key (like the restaurant name)
-              name={restaurant.name}
-              image={restaurant.image}
-              rating={restaurant.rating}
-            />
-          ))}
-        </div>
+      {/* Restaurant Cards Section */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-8">
+          Top Restaurants
+        </h2>
+        {filteredRestaurants.length === 0 ? (
+          <p className="text-center text-gray-500">No restaurants available.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredRestaurants.map((restaurant) => (
+              <Link key={restaurant._id} to={`/restaurant/${restaurant._id}`}>
+                <RestaurantCard
+                  name={restaurant.name}
+                  image={restaurant.image}
+                  rating={restaurant.rating}
+                  isOpen={restaurant.isOpen} // Pass isOpen prop
+                />
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
