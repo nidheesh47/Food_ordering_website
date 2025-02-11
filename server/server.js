@@ -11,11 +11,16 @@ const db = connectDB;
 db();
 
 app.use(cookieParser());
+const allowedOrigins = [
+  "http://localhost:5173", // For local development
+  "https://food-ordering-website-virid.vercel.app", // For production
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-    methods: ["GET", "PUT", "DELETE", "POST", "PATCH"],
+    origin: allowedOrigins, // Allow multiple origins
+    credentials: true, // Allow credentials (cookies, authorization headers)
+    methods: ["GET", "PUT", "DELETE", "POST", "PATCH"], // Allowed HTTP methods
   })
 );
 cookieParser();
