@@ -1,19 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { axiosInstance } from "../../config/axioInstance";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { AuthContext } from "../../context/AuthContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // State to hold error messages
-  const [loading, setLoading] = useState(false); // State for loading indicator
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { setIsUserAuth } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
-    setLoading(true); // Show loading state
+    setError("");
+    setLoading(true);
 
     try {
       const response = await axiosInstance.post("/user/login", {
@@ -21,21 +23,23 @@ const LoginPage = () => {
         password,
       });
       toast.success("Login successful!");
+      localStorage.setItem("token", response.data.token);
+      setIsUserAuth(true);
       navigate("/");
     } catch (err) {
       setError(
         err.response?.data?.message || "An error occurred. Please try again."
       );
       toast.error("Login failed. Please check your credentials.");
-      console.error("Login error:", err); // Log error for debugging
+      console.error("Login error:", err);
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <Toaster /> {/* Add Toaster */}
+      <Toaster />
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <h2 className="text-2xl font-semibold text-center text-yellow-900 mb-6">
           Login to Your Account
@@ -85,7 +89,7 @@ const LoginPage = () => {
             className={`w-full py-2 font-semibold rounded-lg transition duration-300 ${
               loading
                 ? "bg-yellow-900 text-gray-800 cursor-not-allowed"
-                : "bg-yellow-900 text-white hover:bg-yellow-900 "
+                : "bg-yellow-900 text-white hover:bg-yellow-900"
             } focus:outline-none focus:ring-2 focus:ring-yellow-900`}
           >
             {loading ? (

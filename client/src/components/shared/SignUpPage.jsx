@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../../config/axioInstance"; // Use the same axiosInstance from the config
+import { Toaster, toast } from "react-hot-toast";
 
 const SignUpPage = () => {
   const [userDetails, setUserDetails] = useState({
@@ -7,6 +10,9 @@ const SignUpPage = () => {
     password: "",
     mobile: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,14 +22,31 @@ const SignUpPage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle sign-up logic here (e.g., make API call)
-    console.log("User signed up with", userDetails);
+    setLoading(true);
+    setError("");
+
+    try {
+      console.log("Request Payload:", userDetails);
+      const response = await axiosInstance.post("/user/signup", userDetails); // Changed the API endpoint to match the login one
+      console.log("Response:", response);
+      toast.success("Sign up successful!");
+      navigate("/login");
+    } catch (err) {
+      console.error("Sign up error:", err);
+      setError(
+        err.response?.data?.message || "An error occurred. Please try again."
+      );
+      toast.error("Sign up failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <Toaster />
       <div className="bg-white p-8 rounded-lg shadow-lg w-full sm:w-96 md:w-80 lg:w-96">
         <h2 className="text-2xl font-semibold text-center text-yellow-900 mb-6">
           Create a New Account
@@ -102,11 +125,34 @@ const SignUpPage = () => {
             />
           </div>
 
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
           <button
             type="submit"
-            className="w-full py-2 bg-yellow-900 text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-900"
+            disabled={loading}
+            className={`w-full py-2 font-semibold rounded-lg transition duration-300 ${
+              loading
+                ? "bg-yellow-900 text-gray-800 cursor-not-allowed"
+                : "bg-yellow-900 text-white hover:bg-yellow-900"
+            } focus:outline-none focus:ring-2 focus:ring-yellow-900`}
           >
-            Sign Up
+            {loading ? (
+              <svg
+                className="animate-spin h-5 w-5 mx-auto"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 5v7l4 4"
+                />
+              </svg>
+            ) : (
+              "Sign Up"
+            )}
           </button>
         </form>
 

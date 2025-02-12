@@ -1,22 +1,27 @@
+import React, { useContext } from "react";
 import {
   Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
   Menu,
   MenuButton,
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { FaShoppingCart } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import ProfilePage from "./ProfilePage";
+import { AuthContext } from "../../context/AuthContext";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function UserHeader() {
+  const { setIsUserAuth } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsUserAuth(false);
+  };
+
   return (
     <Disclosure as="nav" className="bg-yellow-900">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -64,12 +69,12 @@ export default function UserHeader() {
                 </MenuItem>
 
                 <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
                   >
                     Sign out
-                  </a>
+                  </button>
                 </MenuItem>
               </MenuItems>
             </Menu>

@@ -1,9 +1,7 @@
+import React from "react";
 import { createBrowserRouter } from "react-router-dom";
-
 import UserLayout from "../layout/UserLayout";
-
 import ErrorPage from "../components/shared/ErrorPage";
-
 import HomePage from "../components/user/HomePage";
 import CartPage from "../components/user/CartPage";
 import AboutPage from "../components/shared/AboutPage";
@@ -52,8 +50,8 @@ const router = createBrowserRouter([
         element: <RestaurantPage />,
       },
       {
-        path: "/restaurant/:restaurantId", // Dynamic route parameter for RestaurantPage
-        element: <RestaurantPage />, // Restaurant details page
+        path: "/restaurant/:restaurantId",
+        element: <RestaurantPage />,
       },
     ],
   },
