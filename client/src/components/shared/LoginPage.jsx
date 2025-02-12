@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { axiosInstance } from "../../config/axioInstance";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -115,9 +115,9 @@ const LoginPage = () => {
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}
-            <a href="/signup" className="text-yellow-900">
+            <Link to="/signup" className="text-yellow-900">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>
