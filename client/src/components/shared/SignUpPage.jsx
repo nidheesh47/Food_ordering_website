@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../config/axioInstance"; // Use the same axiosInstance from the config
 import { Toaster, toast } from "react-hot-toast";
-
+import { Link } from "react-router-dom";
 const SignUpPage = () => {
   const [userDetails, setUserDetails] = useState({
     name: "",
@@ -159,9 +159,9 @@ const SignUpPage = () => {
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
-            <a href="/login" className="text-yellow-900">
+            <Link to="/login" className="text-yellow-900">
               Log in
-            </a>
+            </Link>
           </p>
         </div>
       </div>
