@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Disclosure,
   Menu,
@@ -9,6 +9,7 @@ import {
 import { FaShoppingCart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { axiosInstance } from "../../config/axioInstance";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -16,6 +17,23 @@ function classNames(...classes) {
 
 export default function UserHeader() {
   const { setIsUserAuth } = useContext(AuthContext);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axiosInstance.get("/user/profile");
+        setUser(response.data.data); // Access the `data` field in the response
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -48,11 +66,17 @@ export default function UserHeader() {
                 <MenuButton className="relative flex rounded-full">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span>
-                  <img
-                    alt=""
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    className="w-8 h-8 rounded-full sm:w-10 sm:h-10"
-                  />
+                  {loading ? (
+                    <div className="w-8 h-8 rounded-full bg-gray-300 animate-pulse sm:w-10 sm:h-10" />
+                  ) : (
+                    <img
+                      alt=""
+                      src={
+                        user?.profilePic || "https://via.placeholder.com/256"
+                      }
+                      className="w-8 h-8 rounded-full sm:w-10 sm:h-10"
+                    />
+                  )}
                 </MenuButton>
               </div>
               <MenuItems

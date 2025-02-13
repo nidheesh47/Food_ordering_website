@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../config/axioInstance"; // Use the same axiosInstance from the config
 import { Toaster, toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 const SignUpPage = () => {
   const [userDetails, setUserDetails] = useState({
     name: "",
@@ -10,6 +12,7 @@ const SignUpPage = () => {
     password: "",
     mobile: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -29,14 +32,14 @@ const SignUpPage = () => {
 
     try {
       console.log("Request Payload:", userDetails);
-      const response = await axiosInstance.post("/user/signup", userDetails); // Changed the API endpoint to match the login one
+      const response = await axiosInstance.post("/user/signup", userDetails);
       console.log("Response:", response);
       toast.success("Sign up successful!");
       navigate("/login");
     } catch (err) {
       console.error("Sign up error:", err);
       setError(
-        err.response?.data?.message || "An error occurred. Please try again."
+        err.response?.data?.message ?? "An error occurred. Please try again."
       );
       toast.error("Sign up failed. Please try again.");
     } finally {
@@ -114,15 +117,24 @@ const SignUpPage = () => {
             >
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={userDetails.password}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-900 focus:border-yellow-900"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={userDetails.password}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-900 focus:border-yellow-900"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
 
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
