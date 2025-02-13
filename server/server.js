@@ -5,12 +5,17 @@ const apiRouter = require("./routes");
 const cookieParser = require("cookie-parser");
 const { PORT, connectDB } = require("./config/db");
 const cors = require("cors");
+
 const port = PORT;
-const db = connectDB;
 
-db();
+// Connect to the database
+connectDB();
 
-app.use(cookieParser());
+// Middleware
+app.use(cookieParser()); // Parse cookies
+app.use(express.json()); // Parse JSON bodies
+
+// CORS configuration
 const allowedOrigins = [
   "http://localhost:5173", // For local development
   "https://food-ordering-website-virid.vercel.app", // For production
@@ -18,25 +23,31 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: allowedOrigins, // Allow multiple origins
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true); // Allow the request
+      } else {
+        callback(new Error("Not allowed by CORS")); // Block the request
+      }
+    },
     credentials: true, // Allow credentials (cookies, authorization headers)
     methods: ["GET", "PUT", "DELETE", "POST", "PATCH"], // Allowed HTTP methods
   })
 );
-cookieParser();
 
-app.use(express.json());
-
+// Routes
 app.get("/", (req, res) => {
-  res.send("hello world");
+  res.send("Hello, world!");
 });
 
 app.use("/api", apiRouter);
 
-app.listen(port, () => {
-  console.log(`server is running on port ${port}`);
+// 404 Handler
+app.all("*", (req, res) => {
+  res.status(404).json({ message: "Endpoint does not exist" });
 });
 
-app.all("*", (req, res) => {
-  res.status(404).json({ message: "end point does not exist" });
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
