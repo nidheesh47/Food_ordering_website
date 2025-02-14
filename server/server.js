@@ -31,7 +31,6 @@ app.use(
       }
     },
     credentials: true, // Allow credentials (cookies, authorization headers)
-    methods: ["GET", "PUT", "DELETE", "POST", "PATCH"], // Allowed HTTP methods
   })
 );
 
