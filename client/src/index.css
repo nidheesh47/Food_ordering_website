@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  user-select: none;
+}
+
+
+
+
+body{
+    font-family: "Poppins", serif;
+    font-weight: 400;
+    font-style: normal;  
+    
+  }
+  
+  .cover{
+    background-image:url("https://png.pngtree.com/background/20230528/original/pngtree-an-arrangement-of-various-indian-food-picture-image_2778221.jpg");
+    background-size: cover;
+    height:60vh;
+    background-repeat: no-repeat;
+  }
+  /* .search{
+    width: 90vh;
+    height: 7vh;
+  }
+  */
+
