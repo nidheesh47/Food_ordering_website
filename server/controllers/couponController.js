@@ -1,71 +1,99 @@
-const Cart = require("../models/cart");
-const Coupon = require("../models/coupon");
+const Coupon = require('../models/couponModel');
 
-const addCoupon = async (req, res) => {
-  try {
-    const { code, discountValue, minOrderAmount, expirationDate, isActive } =
-      req.body;
-    if (!code || !discountValue || !minOrderAmount || !expirationDate) {
-      return res.status(400).json({ message: "All field are required" });
+exports.createCoupon = async (req,res)=>{
+    try{
+        const {code, discountPercentage,maxDiscountValue,minOrderValue,expiryDate} = req.body
+        if(!code || !discountPercentage || !maxDiscountValue || !minOrderValue || !expiryDate){
+            return res.status(400).json({message: "All fields required"})
+        }
+        const couponExist = await Coupon.findOne({code})
+        if(couponExist){
+            return res.status(400).json({message: "Coupon already exist"})
+        }
+        const coupon = new Coupon({code,discountPercentage,maxDiscountValue,minOrderValue,expiryDate })
+        await coupon.save()
+        res.status(201).json({message: "Coupon created successfully", coupon})
+    }catch(error){
+        res.status(500).json({message: error.message})
     }
-    const newCoupon = new Coupon({
-      code,
-      discountValue,
-      minOrderAmount,
-      expirationDate,
-      isActive: req.body.isActive !== undefined ? req.body.isActive : true,
-    });
+}
 
-    const savedCoupon = await newCoupon.save();
-    res.status(201).json({
-      message: "Coupon created successfully",
-      coupon: savedCoupon,
-    });
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(400).json({ message: "Coupon code already exists" });
+exports.applyCoupon = async (req, res) => {
+    try {
+        const { code, orderValue } = req.body;
+        if (!code || !orderValue) {
+            return res.status(400).json({ message: "Coupon code and order value are required" });
+        }
+        const coupon = await Coupon.findOne({ code });
+        if (!coupon) {
+            return res.status(404).json({ message: "Coupon not found" });
+        }
+        const currentDate = new Date();
+        if (new Date(coupon.expiryDate) < currentDate) {
+            return res.status(400).json({ message: "Coupon has expired" });
+        }
+        if (orderValue < coupon.minOrderValue) {
+            return res.status(400).json({ 
+                message: `Order value must be at least ${coupon.minOrderValue} to use this coupon`
+            });
+        }
+        const discount = Math.min(
+            (orderValue * coupon.discountPercentage) / 100,
+            coupon.maxDiscountValue
+        );
+        const finalPrice = orderValue - discount;
+        res.status(200).json({
+            message: "Coupon applied successfully",
+            discount,
+            finalPrice
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-    res
-      .status(500)
-      .json({ message: "Internal Server error", error: error.message });
-  }
 };
 
-const updateCoupon = async (req, res) => {
-  try {
-    const { discountValue, minOrderAmount, expirationDate, isActive } =
-      req.body;
-    const { couponId } = req.params;
-    const coupon = await Coupon.findById(couponId);
-    if (!coupon) {
-      return res.status(404).json({ message: "coupon not found" });
+exports.getCoupons = async (req,res) =>{
+    try{
+        const coupons = await Coupon.find()
+        if(coupons.length===0){
+            return res.status(404).json({message: "No coupons found"})
+        }
+        res.status(200).json({message: "Coupons fetched successfully", coupons: coupons})
+    }catch(error){
+        res.status(500).json({message: error.message})
     }
-    if (discountValue) coupon.discountValue = discountValue;
-    if (minOrderAmount) coupon.minOrderAmount = minOrderAmount;
-    if (expirationDate) coupon.expirationDate = expirationDate;
-    if (isActive) coupon.isActive = isActive;
+}
 
-    const UpdatedCoupon = await coupon.save();
-    return res
-      .status(200)
-      .json({ message: "coupon updated successfully", UpdatedCoupon });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal Server error", error: error.message });
-  }
-};
+exports.updateCoupon = async (req,res) =>{
+    try{
+        const {id} = req.params
+        const {discountPercentage, maxDiscountValue, minOrderValue, expiryDate, isActive} = req.body;
+        const coupon = await Coupon.findById(id)
+        if(!coupon){
+            return res.status(404).json({message: "Coupon not found"})
+        }
+        if(discountPercentage) coupon.discountPercentage = discountPercentage
+        if(maxDiscountValue) coupon.maxDiscountValue = maxDiscountValue
+        if(minOrderValue) coupon.minOrderValue = minOrderValue
+        if(expiryDate) coupon.expiryDate = expiryDate
+        if(isActive) coupon.isActive = isActive
+        await coupon.save()
 
-const applyCoupon = async (totalAmount, couponId) => {
-  if (!couponId) return totalAmount;
-  const coupon = await Coupon.findById(couponId);
-  if (!coupon) throw new Error("coupon not found");
-  if (!coupon.isActive) throw new Error("Coupon is inactive");
-  if (coupon.expirationDate < new Date()) throw new Error("coupon expired");
-  if (totalAmount < coupon.minOrderAmount)
-    throw new Error(`order is lessthan ${coupon.minOrderAmount}`);
-  const discount = totalAmount - coupon.discountValue;
-  return discount;
-};
+        res.status(200).json({message: "Coupon updated successfully", coupon})
+    }catch(error){
+        res.status(500).json({message: error?.message})
+    }
+}
 
-module.exports = { addCoupon, updateCoupon, applyCoupon };
+exports.deleteCoupon = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const coupon = await Coupon.findByIdAndDelete(id);
+      if (!coupon) {
+        return res.status(404).json({ message: "Coupon not found." });
+      }
+      res.status(200).json({ message: "Coupon deleted successfully." });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };

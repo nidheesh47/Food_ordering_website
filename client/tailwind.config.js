@@ -1,13 +1,22 @@
-import withMT from "@material-tailwind/react/utils/withMT";
-import daisyui from "daisyui";
-
-export default withMT({
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+// tailwind.config.js
+import daisyui from 'daisyui';
+export default {
+  content: [
+    "./src/**/*.{html,js,jsx,ts,tsx}", 
+  ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        
+        background: "#f5f5f5", 
+        text:"#000000",         
+      },
+    },
   },
   plugins: [daisyui],
   daisyui: {
-    themes: ["light"], // Explicitly use only the light theme
+    themes: [
+      "light",
+    ],
   },
-});
+}

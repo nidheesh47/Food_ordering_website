@@ -1,66 +1,129 @@
+import React, { useState } from "react";
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
+import LoginPage from "../../pages/shared/Login";
+import SignUpPage from "../../pages/shared/Signup";
 
-const navigation = [];
+const navigation = [
+  { name: "About Us", href: "/about", current: false },
+  { name: "Restaurants", href: "/all-restuarant", key: "restaurants" },
+];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Header() {
-  return (
-    <Disclosure as="nav" className="bg-orange-600">
-      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-        <div className="relative flex h-16 items-center justify-between">
-          {/* Logo Section */}
-          <div className="flex-shrink-0">
-            <Link>
-              <h1 className="roboto-medium font-bold text-white text-3xl sm:text-5xl">
-                Fryomi
-              </h1>
-            </Link>
-          </div>
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
 
-          {/* Desktop Menu */}
-          <div className="hidden sm:flex sm:space-x-4">
-            <Link to="/login">
-              <button className="rounded-md bg-white py-2 px-4 border border-transparent text-center text-sm text-orange-600 font-medium roboto transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
+  const openLogin = () => setIsLoginOpen(true);
+  const closeLogin = () => setIsLoginOpen(false);
+
+  const openSignUp = () => setIsSignUpOpen(true);
+  const closeSignUp = () => setIsSignUpOpen(false);
+
+  return (
+    <>
+      <Disclosure as="nav" className="bg-orange-600">
+        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            {/* Mobile Menu Button */}
+            <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+              <DisclosureButton className="relative inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
+                <span className="sr-only">Open main menu</span>
+                <Bars3Icon
+                  aria-hidden="true"
+                  className="block size-6 group-data-[open]:hidden"
+                />
+                <XMarkIcon
+                  aria-hidden="true"
+                  className="hidden size-6 group-data-[open]:block"
+                />
+              </DisclosureButton>
+            </div>
+
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <Link to="/">
+                <h2 className="text-4xl font-bold text-white">Fryomi</h2>
+              </Link>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex flex-1 items-center justify-start sm:items-stretch sm:justify-start">
+              <div className="hidden sm:ml-6 sm:block">
+                <div className="flex space-x-4">
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={classNames(
+                        item.current
+                          ? "bg-white/10 text-white"
+                          : "text-white hover:bg-white/10 hover:text-white",
+                        "rounded-md px-3 py-2 text-sm font-medium transition duration-200"
+                      )}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={openLogin}
+                className="rounded-md bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20 transition duration-200"
+              >
                 Login
               </button>
-            </Link>
-            <Link to="/signup">
-              <button className="rounded-md bg-white py-2 px-4 border border-transparent text-center text-sm text-orange-600 font-medium roboto transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
-                Signup
+              <button
+                onClick={openSignUp}
+                className="rounded-md bg-white px-4 py-2 text-sm font-medium text-orange-600 hover:bg-white/90 transition duration-200"
+              >
+                Sign Up
               </button>
-            </Link>
-          </div>
-
-          {/* Mobile Hamburger Menu */}
-          <div className="sm:hidden">
-            <Disclosure.Button className="inline-flex items-center justify-center p-2 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-              <span className="sr-only">Open main menu</span>
-              <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-            </Disclosure.Button>
+            </div>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        <Disclosure.Panel className="sm:hidden">
-          <div className="space-y-1 px-2 pt-2 pb-3">
-            <button className="w-full text-left rounded-md py-2 px-4 text-sm font-medium text-orange-600 bg-white hover:bg-slate-700 hover:text-white focus:outline-none focus:bg-slate-700 focus:text-white">
-              Login
-            </button>
-            <button className="w-full text-left rounded-md py-2 px-4 text-sm font-medium text-orange-600 bg-white hover:bg-slate-700 hover:text-white focus:outline-none focus:bg-slate-700 focus:text-white">
-              Signup
-            </button>
+        {/* Mobile Menu Panel */}
+        <DisclosurePanel className="sm:hidden">
+          <div className="space-y-1 px-2 pb-3 pt-2">
+            {navigation.map((item) => (
+              <DisclosureButton
+                key={item.name}
+                as={Link}
+                to={item.href}
+                className={classNames(
+                  item.current
+                    ? "bg-white/10 text-white"
+                    : "text-white hover:bg-white/10",
+                  "block rounded-md px-3 py-2 text-base font-medium"
+                )}
+              >
+                {item.name}
+              </DisclosureButton>
+            ))}
           </div>
-        </Disclosure.Panel>
-      </div>
-    </Disclosure>
+        </DisclosurePanel>
+      </Disclosure>
+
+      {/* Login and Sign-Up Pages */}
+      <LoginPage
+        isOpen={isLoginOpen}
+        onClose={closeLogin}
+        onOpenSignUp={openSignUp}
+      />
+      <SignUpPage isOpen={isSignUpOpen} onClose={closeSignUp} />
+    </>
   );
 }

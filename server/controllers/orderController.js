@@ -1,124 +1,174 @@
-const Cart = require("../models/cart");
-const Coupon = require("../models/coupon");
-const Order = require("../models/order");
-const User = require("../models/user");
-const { applyCoupon } = require("./couponController");
+const Cart = require('../models/cartModel');
+const Coupon = require('../models/couponModel');
+const coupon = require('../models/couponModel');
+const Order = require('../models/orderModel');
 
-const createOrder = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { cartId, deliveryAddressId, couponCodeId, status } = req.body;
-    const user = await User.findById(userId);
-    const role = req.role;
-    if (!user) {
-      return res.status(400).json({ message: "User is not Authorized" });
-    }
+const ORDER_STATUS = [
+    "pending",
+    "confirmed",
+    "preparing",
+    "out for delivery",
+    "delivered",
+  ];
 
-    const cart = await Cart.findById(cartId);
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
-    }
-    if (!couponCodeId) {
-      return res.status(400).json({ message: "coupon id required" });
-    }
-    const coupon = await Coupon.findById(couponCodeId);
-    const totalprice = cart.totalPrice;
-    let finalPrice = await applyCoupon(totalprice, couponCodeId);
-    const existingOrder = await Order.findOne({ userId, status: "pending" });
 
-    if (existingOrder) {
-      // Update existing pending order
-      if (couponCodeId) existingOrder.couponCodeId = couponCodeId;
-      if (deliveryAddressId)
-        existingOrder.deliveryAddressId = deliveryAddressId;
-      if (existingOrder.status === "confirmed") {
-        if (status === "cancelled") existingOrder.status = status;
+exports.createOrder = async (req, res) => {
+    try {
+        const user = req.user.id
+
+
+        const {
+            restaurant,
+            cartId,
+            coupon,
+            deliveryAddress,
+        } = req.body;
+        const findCoupon = await Coupon.findOne({ code:coupon }); 
+        let order = await Order.findOne({user})
+        // if (!order || order.status !== "pending") {
+            order = new Order({
+              user,
+              restaurant,
+              cartId,
+              coupon:findCoupon?._id,
+              deliveryAddress,
+            });
+          // } else {
+          //   return res.status(400).json({ message: "An order is already in pending status" });
+          // }
+        await order.save();
+        res.status(201).json({ message: "Order created successfully", order: order });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+exports.getAllOrders = async (req,res)=>{
+    try{
+        const user = req.user.id
+        const orders = await Order.find({user}).sort({createdAt:-1})
+        .populate("user", "name email phone")
+        .populate("restaurant", "name location")
+        .populate({
+          path: "cartId",
+          select: "items totalPrice",
+          populate: {
+            path: "items.foodId",
+            select: "name",
+          },
+        })
+        .populate("coupon", "code discountPercentage maxDiscountValue")
+        .populate("deliveryAddress", "street city state zipCode")
+        if(!orders){
+            return res.status(404).json({message: "No orders found for this profile"})
+        }
+        res.status(200).json({message: "Orders found successfully", orders})
+    }catch(error){
+        res.status(500).json({message: error.message})
+    }
+  }
+  
+  exports.getOrderById = async (req, res) => {
+    try {
+        const user = req.user.Id
+      const { orderId } = req.params;
+      const order = await Order.findOne({_id:orderId}, {user: user})
+        .populate("user", "name email phone")
+        .populate("restaurant", "name location")
+        .populate({
+          path: "cartId",
+          select: "items totalPrice",
+          populate: {
+            path: "items.foodId",
+            select: "name",
+          },
+        })
+        .populate("coupon", "code discountPercentage maxDiscountValue")
+        .populate("deliveryAddress", "street city state zipCode")
+    
+        if (!order) {
+        return res.status(404).json({ message: "Order not found." });
       }
-      existingOrder.finalPrice = finalPrice; // Update the final price with the new coupon
-      existingOrder.discount = coupon.discountValue; // Update the discount if it's changed
-      await existingOrder.save(); // Save the updated order
-      return res
-        .status(200)
-        .json({ message: "Order updated successfully", order: existingOrder });
+      res.status(200).json({ message: "Order retrieved successfully", order });
+    } catch (error) {
+      console.log(error);
+      
+      res.status(500).json({ message: error.message });
     }
-    const order = new Order({
-      userId,
+  };
 
-      cartId,
-      couponCodeId,
-      deliveryAddressId,
-      finalPrice,
-      discount: coupon.discountValue,
-    });
+  exports.updateOrderUser = async (req,res)=>{
+    try{
+        const user = req.user.id
+        const orderId  = req.params.orderId;
+        const{coupon, status, deliveryAddress} = req.body
+        const order = await Order.findById(orderId);
 
-    await order.save();
-
-    res.status(201).json({ message: "Order created successfully", order });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const updateStatus = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({ message: "User is not Authorized" });
+        if(!order){
+            return res.status(404).json({message: "No order found"})
+        }
+        if(order.status === "cancelled"){
+            return res.status(400).json({message: "Order is already cancelled"})
+        }
+        if(coupon) order.coupon = coupon
+        if(deliveryAddress) order.deliveryAddress = deliveryAddress
+        if(user.toString() === order.user._id.toString()){
+            if(status){
+                if(status === "cancelled"){
+                    order.status = "cancelled"
+                }else {
+                    return res.status(400).json({ message: "Users are only allowed to cancel orders." });
+                }
+            }
+        }
+        await order.save()
+        res.status(200).json({message: "Order update successfully", order: order})
+    }catch(error){
+        res.status(500).json({message: error.message})
     }
-    const { status, orderId } = req.body;
-    const order = await Order.findById(orderId);
+}
 
-    if (!order) {
-      return res.status(404).json({ message: "No order found" });
-    }
-    if (order.status === "cancelled") {
-      return res
-        .status(400)
-        .json({ message: "Cannot update status for cancelled order" });
-    }
-    const orderStatus = [
-      "confirmed",
-      "preparing",
-      "out for delivery",
-      "delivered",
-    ];
-    const currentIndex = orderStatus.findIndex((s) => s === order.status);
-    const requestedIndex = orderStatus.findIndex((s) => s === status);
-
-    // Validate the requested status
-    if (requestedIndex === -1) {
-      return res.status(400).json({ message: "Invalid status provided" });
-    }
-
-    // Ensure the requested status follows the correct transition order
-    if (requestedIndex !== currentIndex + 1) {
-      return res.status(400).json({
-        message: `Cannot update status to '${status}'. Current status: '${
-          order.status
-        }', allowed next status: '${orderStatus[currentIndex + 1] || "none"}'`,
+  exports.updateOrderStatus = async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      const order = await Order.findById(orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found." });
+      }
+      const currentIndex = ORDER_STATUS.indexOf(order.status);
+      if (currentIndex === -1 || currentIndex === ORDER_STATUS.length - 1) {
+        return res
+          .status(400)
+          .json({ message: "Order is already in the final state." });
+      }
+      order.status = ORDER_STATUS[currentIndex + 1];
+      await order.save();
+      res.status(200).json({
+        message: `Order status updated to '${order.status}'`,
+        order,
       });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
+  };
 
-    order.status = status;
-    await order.save();
-    res.status(200).json({ message: "Updated sucessfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
-const deleteOrder = async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const order = await Order.findByIdAndDelete(orderId);
-    if (!order) {
-      return res.status(404).json({ message: "No order found" });
+  
+  
+  exports.getAllRestaurantOrders = async (req,res)=>{
+    try{
+        const restaurantId = req.params.restaurantId
+        const orders = await Order.find({restaurant: restaurantId, status: { $ne: "cancelled" }})
+        .populate("user", "name email phone")
+        .populate("restaurant", "name location")
+        .populate("cartId", "items totalPrice")
+        .populate("coupon", "code discountPercentage maxDiscountValue") 
+        if(!orders){
+            return res.status(404).json({message: "No orders found for this profile"})
+        }
+        res.status(200).json({message: "Orders found successfully", orders})
+    }catch(error){
+        res.status(500).json({message: error.message})
     }
-    res.status(200).json({ message: "order deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
-};
-
-module.exports = { createOrder, updateStatus, deleteOrder };

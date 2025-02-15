@@ -1,148 +1,96 @@
-const Address = require("../models/address");
-const User = require("../models/user");
+const Address = require("../models/addressModel");
+const User = require('../models/userModel')
 
-const addAddress = async (req, res) => {
+// add address
+exports.addAddress = async (req, res) => {
+
+    try {
+      const userId = req.user.id;
+
+      const { street, city, state, postalCode, name } = req.body;
+  
+      const addressExists = await Address.findOne({ 
+        user: userId,
+        name: name
+      });
+      if (addressExists) {
+        return res
+          .status(400)
+          .json({ message: `Address in this name already Exist Name: ${name}` });
+      }
+      const address = new Address({
+        street,
+        city,
+        state,
+        postalCode,
+        name,
+        user: userId,
+      });
+      await address.save();
+      res.status(201).json({
+        message: "Address saved successfully",
+        address: address,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  //get address
+exports.getAddresses = async (req, res) => {
   try {
-    const userId = req.user.id;
-    if (!userId) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "No user found" });
-    }
-    const role = req.user.role;
-    if (!user || role !== "user") {
-      return res.status(401).json({ message: "Unauthorized user" });
-    }
-    const { housename, street, city, state, pincode } = req.body;
-    if (!housename || !street || !city || !state || !pincode) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-    const addressExist = await Address.findOne({ housename, user: userId });
-    if (addressExist) {
-      return res.status(400).json({ message: "Address already exists" });
-    }
-    const newAddress = new Address({
-      housename,
-      street,
-      city,
-      state,
-      pincode,
-      user: userId,
-    });
-    const saveAddress = await newAddress.save();
-    res
-      .status(201)
-      .json({ message: "Address created successfully", address: saveAddress });
+    const addresses = await Address.find({ user: req.user.id });
+    res.status(200).json(addresses);
   } catch (error) {
-    console.error("Error in creating address:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
-const editeAddress = async (req, res) => {
+exports.getAddressById = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const user = await User.findById(userId);
-    const role = req.user.role;
-    if (!user || role !== "user") {
-      return res.status(401).json({ message: "Unauthorized user" });
-    }
-    const { housename, street, city, state, pincode } = req.body;
-    const { addressId } = req.params;
-    if (!addressId) {
-      return res.status(400).json({ message: "Address Id is required" });
-    }
-    const address = await Address.findById(addressId);
+    const addressId = req.params.addressId;
+    const address = await Address.findById({
+      user: req.user.userId,
+      _id: addressId,
+    }).populate("user");
+    res.status(200).json(address);
+  } catch (error) {
+    res.status(500).json({ Message: error.message });
+  }
+};
+
+exports.updateAddress = async (req, res) => {
+  try {
+    const addressId = req.params.addressId;
+    const { street, city, state, postalCode, name } = req.body;
+    const address = await Address.findById({
+      user: req.user.userId,
+      _id: addressId,
+    });
     if (!address) {
-      return res.status(404).json({ message: "Address item not found" });
+      res.status(404).json({ message: "Address not found" });
     }
-    if (housename) address.housename = housename;
     if (street) address.street = street;
     if (city) address.city = city;
     if (state) address.state = state;
-    if (pincode) address.pincode = pincode;
+    if (postalCode) address.postalCode = postalCode;
+    if (name) address.name = name;
 
-    const editedAddress = await address.save();
-    res.status(200).json({
-      message: "Address updated successfully",
-      address: editedAddress,
-    });
-  } catch (error) {
-    console.error("Error updating address", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-const getAddress = async (req, res) => {
-  try {
-    const { addressId } = req.params;
-    if (!addressId) {
-      return res.status(400).json({ message: "address Id is not found" });
-    }
-    const findAddress = await Address.findById(addressId);
-    if (!findAddress) {
-      return res.status(404).json({ message: "address is not found" });
-    }
+    await address.save();
     res
       .status(200)
-      .json({ message: "successfully fetched address", findAddress });
+      .json({ message: "Address updated successfully", address: address });
   } catch (error) {
-    console.error("Error fetching address", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
-const getAddresses = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    if (!userId) {
-      return res.status(400).json({ message: "user Id is not found" });
+exports.deleteAddress = async (req,res)=>{
+    try{
+        const addressId = req.params.addressId
+        const address = await Address.findByIdAndDelete({user: req.user.userId, _id:addressId})
+        res.json({message: "Address deleted successfully"})
+    }catch(error){
+        res.status(500).json({message: error.message})
     }
-    const user = await User.findById(userId);
-    const address = await Address.find({ user: user });
-    if (!address) {
-      return res.status(404).json({ message: "address is not found" });
-    }
-    res
-      .status(200)
-      .json({ message: "successfully fetched addresses", address });
-  } catch (error) {
-    console.error("Error fetching addresses", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-const deleteAddress = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const user = await User.findById(userId);
-    const role = req.user.role;
-    if (!user || role !== "user") {
-      return res.status(401).json({ message: "Unauthorized user" });
-    }
-    const { addressId } = req.params;
-    if (!addressId) {
-      return res.status(400).json({ message: "address id is required" });
-    }
-    const address = await Address.findByIdAndDelete(addressId);
-    if (!address) {
-      return res.status(404).json({ message: "address is not found " });
-    }
-    res.status(200).json({ message: "address delete successfully" });
-  } catch (error) {
-    {
-      console.error("Error deleting menu item:", error);
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-  }
-};
-
-module.exports = {
-  addAddress,
-  editeAddress,
-  getAddress,
-  getAddresses,
-  deleteAddress,
-};
+}

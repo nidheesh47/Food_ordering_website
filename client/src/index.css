@@ -1,39 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-.searchbar-img {
-  background-image: url("/background.avif");
-  background-size: cover;
-  width: 100%;
-  height: 75vh;
+
+*{
+  user-select: none;
 }
 
-.roboto-medium {
-  font-family: "Roboto", sans-serif;
-  font-style: normal;
-  font-weight: 900;
-  word-spacing: 2px;
-}
-.roboto {
-  font-family: "Roboto", sans-serif;
-  font-style: normal;
-  word-spacing: 2px;
-}
-/* Change the color of the round buttons */
-.slick-prev,
-.slick-next {
-  background-color: #ff5733; /* Your desired button color */
-  border-radius: 50%; /* Makes the button round */
-  color: white; /* Button icon color */
-  width: 40px; /* Size of the button */
-  height: 40px;
-  line-height: 40px; /* Center text vertically */
-  text-align: center; /* Center text horizontally */
-  font-size: 20px; /* Icon size */
-}
 
-/* Optional: Change the icon color */
-.slick-prev:before,
-.slick-next:before {
-  color: gray !important; /* Icon color */
-}
+
+
+body{
+    font-family: "Poppins", serif;
+    font-weight: 400;
+    font-style: normal;  
+    
+  }
+  
+  .cover{
+    background-image:url("https://png.pngtree.com/background/20230528/original/pngtree-an-arrangement-of-various-indian-food-picture-image_2778221.jpg");
+    background-size: cover;
+    height:60vh;
+    background-repeat: no-repeat;
+  }
+  /* .search{
+    width: 90vh;
+    height: 7vh;
+  }
+  */
+

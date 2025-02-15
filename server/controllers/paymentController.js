@@ -1,23 +1,27 @@
-const Payment = require("../models/payment.js");
-const Order = require("../models/order.js");
-const Crypto = require("crypto");
-const razorpay = require("../config/razorPay.js");
-const User = require("../models/user.js");
-const createPayment = async (req, res) => {
+const Payment = require("../models/paymentModel");
+const RazorPay = require("razorpay");
+const dotenv = require("dotenv");
+const Order = require("../models/orderModel");
+const crypto = require("crypto");
+const Cart = require("../models/cartModel");
+
+dotenv.config();
+
+const razorpay = new RazorPay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_SECRET_KEY,
+});
+exports.createPayment = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const user = req.user.id;
     const { orderId } = req.params;
-    const user = await User.findById(userId);
-    const role = req.role;
-    if (!user) {
-      return res.status(400).json({ message: "User is not Authorized" });
-    }
+
     const order = await Order.findById(orderId);
     if (order.status !== "pending") {
       if (order.status === "cancelled") {
         return res
           .status(400)
-          .json({ message: "Cannot make payment for cancelled order" });
+          .json({ message: "cannot make payment for cancelled order" });
       }
       if (order.status === "delivered") {
         return res
@@ -26,7 +30,7 @@ const createPayment = async (req, res) => {
       }
       return res.status(400).json({
         message:
-          "You have already made the payment for this order, your order will reach you soon",
+          "You have already made the payment for this order,your order in on the way",
       });
     }
     const amount = order.finalPrice;
@@ -34,9 +38,10 @@ const createPayment = async (req, res) => {
     const razorpayOrder = await razorpay.orders.create({
       amount: amountInPaisa,
       currency: "INR",
-      receipt: `receipt_${Date.now()}`,
+      receipt: `recepit_${Date.now()}`,
       notes: { orderId: order, userId: user },
     });
+
     const newPayment = new Payment({
       orderId,
       user,
@@ -47,7 +52,7 @@ const createPayment = async (req, res) => {
 
     const savedPayment = await newPayment.save();
     res.status(201).json({
-      message: "Payment initiated successfully.",
+      message: "Payment initiated successfully",
       payment: savedPayment,
       razorpayOrder,
     });
@@ -56,28 +61,55 @@ const createPayment = async (req, res) => {
   }
 };
 
-const verifyPayment = async (req, res) => {
+exports.verifyPayment = async (req, res) => {
   try {
-    const { orderId, transactionId, signature } = req.body;
-    const order = await Order.findById(orderId);
-    const secret = process.env.RAZORPAY_SECRET_KEY;
-    const hmac = crypto.createHmac("sha256", secret);
-    hmac.update(orderId + "|" + transactionId);
-    const generateSignature = hmac.digest("hex");
-    if (generateSignature === signature) {
-      order.status = "confirmed";
-      await order.save();
-      return res
-        .status(200)
-        .json({ success: true, message: "Payment verified" });
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      req.body;
+    const sign = razorpay_order_id + "|" + razorpay_payment_id;
+    const generated_signature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_SECRET_KEY)
+      .update(sign)
+      .digest("hex");
+    if (generated_signature === razorpay_signature) {
+      const payment = await Payment.findOneAndUpdate(
+        { transactionId: razorpay_order_id },
+        { status: "success" },
+        { new: true }
+      );
+      const order = await Order.findOneAndUpdate(
+        { _id: payment.orderId },
+        { status: "confirmed" }
+      );
+
+      const cart = await Cart.findOneAndUpdate(
+        { _id: order.cartId },
+        { cartStatus: "ordered" },
+        { new: true }
+      );
+      return res.status(200).json({ message: "Payment is successful" });
     } else {
       return res
         .status(400)
-        .json({ success: false, message: "payment not verified" });
+        .json({ message: "Payment verification failed at backend" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error during payment verification:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
-module.exports = { createPayment, verifyPayment };
+exports.getPayments = async (req, res) => {
+  try {
+    const payment = await Payment.find().populate('user')
+    return res
+      .status(200)
+      .json({ message: "Payment fetched successfully", data: payment })
+  } catch (error) {
+    console.error("Error during payment fetching:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+};

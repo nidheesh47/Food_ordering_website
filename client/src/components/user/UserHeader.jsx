@@ -1,101 +1,136 @@
-import React, { useContext, useEffect, useState } from "react";
 import {
   Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
   Menu,
   MenuButton,
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
-import { FaShoppingCart } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
-import { axiosInstance } from "../../config/axioInstance";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { FaCartShopping } from "react-icons/fa6";
+import { FaUserCircle } from "react-icons/fa"; // Updated import
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { axiosInstance } from "../../config/axiosInstance";
+import toast from "react-hot-toast";
+
+const navigation = [
+  { name: "About Us", href: "/about", key: "about" },
+  { name: "Restaurants", href: "/all-restuarant", key: "restaurants" },
+];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function UserHeader() {
-  const { setIsUserAuth } = useContext(AuthContext);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+function UserHeader() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await axiosInstance.get("/user/profile");
-        setUser(response.data.data); // Access the `data` field in the response
-      } catch (error) {
-        console.error("Failed to fetch user profile:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsUserAuth(false);
+  const userLogout = async () => {
+    try {
+      await axiosInstance({ method: "PUT", url: "user/logout" });
+      localStorage.clear();
+      toast.success("Logout successfully");
+      navigate("/");
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
-    <Disclosure as="nav" className="bg-yellow-900">
-      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-        <div className="relative flex h-16 items-center justify-between">
+    <Disclosure as="nav" className="bg-orange-600">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* Mobile Menu Button */}
+          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+            <DisclosureButton className="relative inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
+              <span className="sr-only">Open main menu</span>
+              <Bars3Icon
+                aria-hidden="true"
+                className="block size-6 group-data-[open]:hidden"
+              />
+              <XMarkIcon
+                aria-hidden="true"
+                className="hidden size-6 group-data-[open]:block"
+              />
+            </DisclosureButton>
+          </div>
+
           {/* Logo */}
-          <div>
+          <div className="flex items-center gap-2">
             <Link to="/">
-              <h1 className="roboto-medium text-white text-3xl sm:text-4xl md:text-5xl">
-                Fryomi
-              </h1>
+              <h2 className="text-4xl font-bold text-white">Fryomi</h2>
             </Link>
           </div>
 
-          {/* Cart and Profile Menu */}
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 gap-3">
-            {/* Cart Icon */}
-            <Link to="/cart">
-              <FaShoppingCart className="text-white text-3xl" />
+          {/* Navigation */}
+          <div className="flex flex-1 items-center justify-start sm:items-stretch sm:justify-start">
+            <div className="hidden sm:ml-6 sm:block">
+              <div className="flex space-x-4">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.key}
+                    to={item.href}
+                    className={classNames(
+                      location.pathname === item.href
+                        ? "bg-white/10 text-white"
+                        : "text-white hover:bg-white/10",
+                      "rounded-md px-3 py-2 text-sm font-medium transition duration-200"
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Notification Bell, Cart, and Profile */}
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              className="relative rounded-full p-1 text-white hover:bg-white/10 focus:outline-none transition duration-200"
+            >
+              <span className="sr-only">View notifications</span>
+              <BellIcon aria-hidden="true" className="size-6" />
+            </button>
+
+            <Link
+              to="/cart"
+              className="relative rounded-full p-1 text-white hover:bg-white/10 transition duration-200"
+            >
+              <FaCartShopping className="size-6" />
             </Link>
 
-            {/* Profile Dropdown Menu */}
-            <Menu as="div" className="relative ml-3">
-              <div>
-                <MenuButton className="relative flex rounded-full">
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">Open user menu</span>
-                  {loading ? (
-                    <div className="w-8 h-8 rounded-full bg-gray-300 animate-pulse sm:w-10 sm:h-10" />
-                  ) : (
-                    <img
-                      alt=""
-                      src={
-                        user?.profilePic || "https://via.placeholder.com/256"
-                      }
-                      className="w-8 h-8 rounded-full sm:w-10 sm:h-10"
-                    />
-                  )}
-                </MenuButton>
-              </div>
-              <MenuItems
-                transition
-                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-              >
+            {/* Profile Dropdown */}
+            <Menu as="div" className="relative">
+              <MenuButton className="relative rounded-full p-1 text-white hover:bg-white/10 focus:outline-none transition duration-200">
+                <span className="sr-only">Open user menu</span>
+                <FaUserCircle className="size-6" />
+              </MenuButton>
+              <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
                 <MenuItem>
                   <Link
                     to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Your Profile
                   </Link>
                 </MenuItem>
-
+                <MenuItem>
+                  <Link
+                    to="/order"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Your Order
+                  </Link>
+                </MenuItem>
                 <MenuItem>
                   <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                    onClick={userLogout}
+                    className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
                   >
                     Sign out
                   </button>
@@ -104,7 +139,30 @@ export default function UserHeader() {
             </Menu>
           </div>
         </div>
+
+        {/* Mobile Menu Panel */}
+        <DisclosurePanel className="sm:hidden">
+          <div className="space-y-1 px-2 pb-3 pt-2">
+            {navigation.map((item) => (
+              <DisclosureButton
+                key={item.key}
+                as={Link}
+                to={item.href}
+                className={classNames(
+                  location.pathname === item.href
+                    ? "bg-white/10 text-white"
+                    : "text-white hover:bg-white/10",
+                  "block rounded-md px-3 py-2 text-base font-medium"
+                )}
+              >
+                {item.name}
+              </DisclosureButton>
+            ))}
+          </div>
+        </DisclosurePanel>
       </div>
     </Disclosure>
   );
 }
+
+export default UserHeader;
