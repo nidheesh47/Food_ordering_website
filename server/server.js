@@ -41,9 +41,15 @@ app.use(
 app.options("*", cors());
 
 // Verify environment variables
+if (!process.env.CLIENT_URL || !process.env.ADMIN_URL) {
+  console.warn(
+    "CLIENT_URL or ADMIN_URL is not set in the environment variables."
+  );
+}
 
 // Connect to the database
-const db = connectDB();
+const db = connectDB;
+db();
 
 // Routes
 app.use("/api/user", userRoutes);
