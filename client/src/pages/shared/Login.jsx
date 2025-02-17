@@ -1,43 +1,43 @@
-import React, { useState } from 'react';
-import { axiosInstance } from '../../config/axiosInstance';
-import { Link, useNavigate } from 'react-router-dom';
-import {useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { axiosInstance } from "../../config/axiosInstance";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 const Login = ({ isOpen, onClose, onOpenSignUp }) => {
-  
-  const {register, handleSubmit} = useForm();
+  const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
 
   const user = {
-    
-    login_api:"/user/login",
-    profile_route:"/",
-    signup_route:{onOpenSignUp},
+    login_api: "/user/login",
+    profile_route: "/",
+    signup_route: { onOpenSignUp },
   };
-  
-  console.log("user==",user);
+
+  console.log("user==", user);
 
   const onSubmit = async (data) => {
-    console.log("dataaa",data)
     try {
-        
-        const response = await axiosInstance.request({ method: "POST", url: user.login_api, data });
-        console.log("response===",response);
+      const response = await axiosInstance.request({
+        method: "POST",
+        url: user.login_api,
+        data,
+        withCredentials: true, // Ensure cookies are sent
+      });
+      console.log("response===", response);
 
-        toast.success("Log-in success");
-        // navigate(user.profile_route);
-        window.location.reload()
+      toast.success("Log-in success");
+      window.location.reload();
     } catch (error) {
-        toast.error("Log-in failed");
-        console.log(error);
+      toast.error("Log-in failed");
+      console.log(error);
     }
-};
+  };
 
   return (
     <div
       className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
+        isOpen ? "translate-x-0" : "translate-x-full"
       } transition-transform duration-300 z-50`}
     >
       <div className="flex justify-between items-center p-4 border-b">
@@ -52,7 +52,9 @@ const Login = ({ isOpen, onClose, onOpenSignUp }) => {
       <div className="p-4">
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               {...register("email")}
@@ -61,7 +63,9 @@ const Login = ({ isOpen, onClose, onOpenSignUp }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               {...register("password")}
@@ -77,7 +81,7 @@ const Login = ({ isOpen, onClose, onOpenSignUp }) => {
           </button>
         </form>
         <p className="mt-4 text-sm text-gray-600">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <button
             className="text-orange-600 hover:underline focus:outline-none"
             onClick={() => {
