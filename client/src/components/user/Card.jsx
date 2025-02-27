@@ -1,18 +1,16 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
 const Card = ({ data }) => {
   return (
-    <div className="cardslider  rounded-2xl overflow-hidden bg-base-100 w-60 shadow-xl">
-      
-        <figure>
-          <img className="w-[100%] h-[15vh]" src={data.image} alt={data.name} />
-        </figure>
-        <div className="card-body flex justify-center">
-          <h2 className="card-title">{data.name}</h2>
-        </div>
-      
-    </div>
+    <figure className="relative w-[200px] h-[200px] rounded-full shadow-xl overflow-hidden group hover:shadow-2xl transition-shadow duration-500">
+      <img
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        src={data.image}
+        alt="Image"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+    </figure>
   );
 };
 
