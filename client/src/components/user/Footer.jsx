@@ -9,18 +9,17 @@ const Footer = () => {
           {/* Logo and Social Media Section */}
           <div className="md:w-[316px]">
             <div className="flex items-center gap-4">
-              <h1 className="text-white font-extrabold text-2xl">Fryomi</h1>
+              <img src="/logo.png" alt="Logo" class="h-8 w-auto" />
             </div>
             <p className="mt-4 text-[15px] font-normal text-white/[80%]">
               © 2025 FRYOMI PRIVATE LIMITED
             </p>
             <div className="mt-6 flex gap-4">
               {[
-                "https://th.bing.com/th/id/R.2bad70f2d08429a28dfbebd4c237924b?rik=vgEdhJ%2f%2biiEnQQ&riu=http%3a%2f%2fpngimg.com%2fuploads%2ffacebook_logos%2ffacebook_logos_PNG19748.png&ehk=0ZiZ04ZZ6mSJ5oyPxBh1gy4FSYhegWTWyDpCiI73sbw%3d&risl=&pid=ImgRaw&r=0",
-                "https://th.bing.com/th/id/OIP.2vAVHsnjWjVWawdQXIUlzgHaHw?rs=1&pid=ImgDetMain",
-                "https://th.bing.com/th/id/R.0768c020c0fa1573b84bfdf665d341b7?rik=1mf%2binWPP3jAGw&riu=http%3a%2f%2fandersonmgt.com%2fwp-content%2fuploads%2f2020%2f05%2fInstagram-icon.jpg&ehk=hK6l5LWS7A7lvg4vNPOAdW5e6BgImpLTgUMzGlg8F9g%3d&risl=&pid=ImgRaw&r=0",
-                "https://th.bing.com/th/id/OIP.PXTov9TveYX3Upu592UOygHaHa?w=209&h=209&c=7&r=0&o=5&dpr=1.1&pid=1.7",
-                "https://th.bing.com/th/id/OIP.1hX8tUyNC8XTZ8u6BLuGEAHaHa?w=182&h=182&c=7&r=0&o=5&dpr=1.1&pid=1.7",
+                "/facebook.png",
+                "/instagram.png",
+                "/twitter.png",
+                "/youtube.png",
               ].map((src, index) => (
                 <a
                   key={index}

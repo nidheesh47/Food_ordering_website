@@ -29,11 +29,10 @@ const AboutPage = () => {
 
       {/* Our Mission Section */}
       <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center mx-auto max-w-6xl">
-        <img
-          src={Logo}
-          alt="Our Mission"
-          className="rounded-xl shadow-xl w-full h-auto"
-        />
+        <div className="bg-teal-800  rounded-xl shadow-xl p-10">
+          <img src={Logo} alt="Our Mission" className=" my-20" />
+        </div>
+
         <div className="bg-white rounded-xl shadow-xl p-10">
           <h2 className="text-4xl font-bold mb-6 text-teal-800">Our Mission</h2>
           <p className="text-gray-700 leading-8 text-lg">
