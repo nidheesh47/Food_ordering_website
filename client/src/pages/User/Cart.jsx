@@ -142,7 +142,7 @@ const CartPage = () => {
             <button
               disabled={!cartItems}
               onClick={handleProceedToCheckout}
-              className="mt-4 px-6 py-2 bg-orange-600 text-white font-semibold rounded-lg shadow-md hover:bg-orange-700"
+              className="mt-4 px-6 py-2 bg-teal-800 text-white font-semibold rounded-lg shadow-md hover:bg-teal-700"
             >
               Proceed to Checkout
             </button>

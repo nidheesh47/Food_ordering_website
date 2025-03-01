@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { axiosInstance } from "../../config/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -13,8 +13,6 @@ const Login = ({ isOpen, onClose, onOpenSignUp }) => {
     profile_route: "/",
     signup_route: { onOpenSignUp },
   };
-
-  console.log("user==", user);
 
   const onSubmit = async (data) => {
     try {
@@ -34,64 +32,74 @@ const Login = ({ isOpen, onClose, onOpenSignUp }) => {
     }
   };
 
+  if (!isOpen) return null; // Don't render if modal is closed
+
   return (
-    <div
-      className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform ${
-        isOpen ? "translate-x-0" : "translate-x-full"
-      } transition-transform duration-300 z-50`}
-    >
-      <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-semibold">Login</h2>
-        <button
-          className="text-gray-600 hover:text-gray-900 focus:outline-none"
-          onClick={onClose}
-        >
-          ✖
-        </button>
-      </div>
-      <div className="p-4">
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              {...register("email")}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-orange-600"
-              placeholder="Enter your email"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              {...register("password")}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-orange-600"
-              placeholder="Enter your password"
-            />
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        {/* Header */}
+        <div className="flex justify-between items-center p-6 border-b">
+          <h2 className="text-2xl font-semibold text-teal-800">Login</h2>
           <button
-            type="submit "
-            className="w-full py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-500 "
+            className="text-gray-600 hover:text-gray-900 focus:outline-none"
+            onClick={onClose}
           >
-            Login
+            ✖
           </button>
-        </form>
-        <p className="mt-4 text-sm text-gray-600">
-          Don't have an account?{" "}
-          <button
-            className="text-orange-600 hover:underline focus:outline-none"
-            onClick={() => {
-              onClose(); // Close login panel
-              onOpenSignUp(); // Open sign-up panel
-            }}
-          >
-            Sign Up
-          </button>
-        </p>
+        </div>
+
+        {/* Body */}
+        <div className="p-6">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            {/* Email Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                {...register("email")}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="Enter your email"
+              />
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                {...register("password")}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="Enter your password"
+              />
+            </div>
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              className="w-full py-3 bg-teal-800 text-white font-semibold rounded-lg hover:bg-teal-700 transition duration-300"
+            >
+              Login
+            </button>
+          </form>
+
+          {/* Sign Up Link */}
+          <p className="mt-6 text-sm text-gray-600 text-center">
+            Don't have an account?{" "}
+            <button
+              className="text-teal-800 hover:underline focus:outline-none"
+              onClick={() => {
+                onClose(); // Close login modal
+                onOpenSignUp(); // Open sign-up modal
+              }}
+            >
+              Sign Up
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );

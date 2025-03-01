@@ -12,19 +12,22 @@ const ErrorPage = () => {
           src="https://th.bing.com/th/id/OIP.yYBFzWZ0R970KK2bJhwO9AHaEi?rs=1&pid=ImgDetMain"
           alt="Error illustration"
         />
-        <h1 className="text-4xl font-bold text-red-500 mb-4">Oops! Page Not Found</h1>
+        <h1 className="text-4xl font-bold text-red-500 mb-4">
+          Oops! Page Not Found
+        </h1>
         <p className="text-lg text-gray-700 mb-6">
-          We couldn't find the page you're looking for. It might have been moved or deleted.
+          We couldn't find the page you're looking for. It might have been moved
+          or deleted.
         </p>
         <div>
           <button
-            className="px-6 py-2 text-white bg-orange-400 rounded hover:bg-orange-400 mr-3"
+            className="px-6 py-2 text-white bg-teal-800 rounded hover:bg-teal-700 mr-3"
             onClick={() => navigate("/")}
           >
             Go to Homepage
           </button>
           <button
-            className="px-6 py-2 text-orange-400 border border-orange-400 rounded hover:bg-orange-40"
+            className="px-6 py-2 text-teal-800 border border-teal-800 rounded"
             onClick={() => navigate(-1)}
           >
             Go Back

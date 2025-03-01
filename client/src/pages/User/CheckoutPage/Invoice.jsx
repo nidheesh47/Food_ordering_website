@@ -8,7 +8,9 @@ function Invoice() {
   const { state } = useLocation();
   const discount = state?.discount;
 
-  const [order, isLoading, error] = useFetch(`/order/get-order-by-id/${orderId}`);
+  const [order, isLoading, error] = useFetch(
+    `/order/get-order-by-id/${orderId}`
+  );
   const orderData = order?.order;
 
   if (isLoading) {
@@ -61,7 +63,9 @@ function Invoice() {
           <table className="min-w-full table-auto border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-4 py-2">Description</th>
+                <th className="border border-gray-300 px-4 py-2">
+                  Description
+                </th>
                 <th className="border border-gray-300 px-4 py-2">Quantity</th>
                 <th className="border border-gray-300 px-4 py-2">Price</th>
                 <th className="border border-gray-300 px-4 py-2">Total</th>
@@ -103,7 +107,7 @@ function Invoice() {
       <div className="mb-4">
         <button
           onClick={() => navigate("/")}
-          className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-500"
+          className="bg-teal-800 text-white px-4 py-2 rounded hover:bg-teal-700"
         >
           Continue Order
         </button>

@@ -40,7 +40,7 @@ function UserHeader() {
   };
 
   return (
-    <Disclosure as="nav" className="bg-orange-600">
+    <Disclosure as="nav" className="bg-teal-800">
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Mobile Menu Button */}

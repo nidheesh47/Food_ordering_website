@@ -30,7 +30,7 @@ export default function Header() {
 
   return (
     <>
-      <Disclosure as="nav" className="bg-orange-600">
+      <Disclosure as="nav" className="bg-teal-800">
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Mobile Menu Button */}
@@ -87,7 +87,7 @@ export default function Header() {
               </button>
               <button
                 onClick={openSignUp}
-                className="rounded-md bg-white px-4 py-2 text-sm font-medium text-orange-600 hover:bg-white/90 transition duration-200"
+                className="rounded-md bg-white px-4 py-2 text-sm font-medium text-teal-800 hover:bg-white/90 transition duration-200"
               >
                 Sign Up
               </button>

@@ -3,7 +3,7 @@ import Logo from "/logo.png";
 
 const Footer = () => {
   return (
-    <div className="mt-8 bg-orange-600 pt-9">
+    <div className="mt-8 bg-teal-800 pt-9">
       <div className="mx-auto w-full max-w-[1166px] px-4 xl:px-0">
         <div className="flex flex-col justify-between gap-8 sm:px-[18px] md:flex-row md:px-10">
           {/* Logo and Social Media Section */}

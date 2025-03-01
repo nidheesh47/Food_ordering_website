@@ -4,7 +4,7 @@ import useFetch from "../../hooks/UseFetch";
 const OrderDetails = () => {
   const [orderData, loading, errors] = useFetch("/order/get-all-order");
   const orders = orderData?.orders;
-  
+
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
@@ -103,7 +103,7 @@ const OrderDetails = () => {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 mx-1 bg-gray-300 text-gray-700 rounded-lg shadow-md hover:bg-orange-500 hover:text-white disabled:bg-gray-200 disabled:text-gray-400 transition-all"
+              className="px-4 py-2 mx-1 bg-gray-300 text-gray-700 rounded-lg shadow-md hover:bg-teal-700 hover:text-white disabled:bg-gray-200 disabled:text-gray-400 transition-all"
             >
               &lt; Previous
             </button>
@@ -113,9 +113,9 @@ const OrderDetails = () => {
               <button
                 key={index}
                 onClick={() => handlePageChange(index + 1)}
-                className={`px-4 py-2 mx-1 rounded-lg text-gray-800 font-semibold hover:bg-orange-500 hover:text-white transition-all ${
+                className={`px-4 py-2 mx-1 rounded-lg text-gray-800 font-semibold hover:bg-teal-700 hover:text-white transition-all ${
                   currentPage === index + 1
-                    ? "bg-orange-600 text-white"
+                    ? "bg-teal-800 text-white"
                     : "bg-gray-200"
                 }`}
               >
@@ -126,7 +126,7 @@ const OrderDetails = () => {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 mx-1 bg-gray-300 text-gray-700 rounded-lg shadow-md hover:bg-orange-500 hover:text-white disabled:bg-gray-200 disabled:text-gray-400 transition-all"
+              className="px-4 py-2 mx-1 bg-gray-300 text-gray-700 rounded-lg shadow-md hover:bg-teal-700 hover:text-white disabled:bg-gray-200 disabled:text-gray-400 transition-all"
             >
               Next &gt;
             </button>

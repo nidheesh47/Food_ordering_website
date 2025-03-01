@@ -12,10 +12,10 @@ function PriceDetails({
   setSelectedCoupon,
   selectedAddressId,
   setSelectedAddressId,
-  address
+  address,
 }) {
- const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+
   if (!cart) {
     return (
       <div className="text-center text-gray-500">No cart data available</div>
@@ -26,7 +26,7 @@ function PriceDetails({
     if (!cart || cart.length === 0) {
       return toast.error("Your cart is empty. Please add items to the cart.");
     }
-  
+
     try {
       // Save address if not already selected
       let addressId = selectedAddressId;
@@ -38,7 +38,7 @@ function PriceDetails({
         }
         setSelectedAddressId(addressId); // Update state with the new address ID
       }
-  
+
       // Proceed with the checkout
       const checkoutData = {
         restaurant: cart.restaurantId,
@@ -46,11 +46,14 @@ function PriceDetails({
         coupon: selectedCoupon || null,
         deliveryAddress: addressId, // Use the updated or existing address ID
       };
-  
-      const response = await axiosInstance.post("/order/create-order", checkoutData);
+
+      const response = await axiosInstance.post(
+        "/order/create-order",
+        checkoutData
+      );
       const orderId = response?.data?.order?._id;
       setSelectedCoupon(null);
-  
+
       // Create payment
       const payment = await axiosInstance.post(`/order/${orderId}/payment`);
       const options = {
@@ -75,16 +78,19 @@ function PriceDetails({
           color: "#1E1E1E",
         },
       };
-  
+
       const razorpayInstance = new Razorpay(options);
       razorpayInstance.open();
     } catch (error) {
-      console.error("Failed to place the order:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Error while placing the order.");
+      console.error(
+        "Failed to place the order:",
+        error.response?.data || error.message
+      );
+      toast.error(
+        error.response?.data?.message || "Error while placing the order."
+      );
     }
   };
-  
-  
 
   return (
     <>
@@ -127,7 +133,7 @@ function PriceDetails({
       <div className="mt-3 flex justify-end ">
         <button
           onClick={handleCheckout}
-          className="btn bg-orange-600 text-white font-normal hover:bg-orange-700"
+          className="btn bg-teal-600 text-white font-normal hover:bg-teal-700"
         >
           Place Order
         </button>

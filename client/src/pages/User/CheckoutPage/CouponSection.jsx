@@ -65,7 +65,9 @@ function CouponSection({
           type="button"
           onClick={handleApplyCoupon}
           disabled={loading}
-          className={`hidden lg:block px-4 py-2 ${loading ? "bg-gray-400" : "bg-orange-600"} text-white rounded`}
+          className={`hidden lg:block px-4 py-2 ${
+            loading ? "bg-gray-400" : "bg-teal-800"
+          } text-white rounded`}
         >
           {loading ? "Validating..." : "Apply Coupon"}
         </button>
@@ -124,7 +126,9 @@ function CouponSection({
           type="button"
           onClick={handleApplyCoupon}
           disabled={loading}
-          className={`w-full px-4 py-2 ${loading ? "bg-gray-400" : "bg-orange-600"} text-white rounded`}
+          className={`w-full px-4 py-2 ${
+            loading ? "bg-gray-400" : "bg-teal-800"
+          } text-white rounded`}
         >
           {loading ? "Validating..." : "Apply Coupon"}
         </button>

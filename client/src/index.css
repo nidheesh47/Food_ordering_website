@@ -13,7 +13,7 @@ body {
 }
 
 .cover {
-  background-image: url("../public/background.avif");
+  background-image: url("/background.avif");
   background-size: cover;
   height: 60vh;
   background-repeat: no-repeat;
