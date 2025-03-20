@@ -27,25 +27,11 @@ app.use(
   cors({
     origin: [process.env.CLIENT_URL, process.env.ADMIN_URL], // Allow requests from these origins
     credentials: true, // Allow cookies and credentials
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Allow these HTTP methods
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Requested-With",
-      "Accept",
-    ], // Allow these headers
   })
 );
 
 // Handle preflight requests
 app.options("*", cors());
-
-// Verify environment variables
-if (!process.env.CLIENT_URL || !process.env.ADMIN_URL) {
-  console.warn(
-    "CLIENT_URL or ADMIN_URL is not set in the environment variables."
-  );
-}
 
 // Connect to the database
 const db = connectDB;
