@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Orders({lastThreeOrders}) {
+function Orders({ lastThreeOrders }) {
   return (
     <div>
       <div className="bg-white shadow-md rounded-lg p-4 lg:p-6">
@@ -36,7 +36,7 @@ function Orders({lastThreeOrders}) {
         )}
         <div className="mt-4">
           <Link to="/order">
-            <button className="btn bg-orange-600 text-white hover:bg-orange-700 px-4 py-2 rounded-md">
+            <button className="btn bg-teal-700 text-white hover:bg-teal-800 px-4 py-2 rounded-md">
               View All Orders
             </button>
           </Link>

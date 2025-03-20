@@ -6,7 +6,7 @@ import Orders from "./Orders";
 import Account from "./Account";
 
 const ProfilePage = () => {
-  const [profile, isLoading, error,fetchData] = useFetch("/user/profile");
+  const [profile, isLoading, error, fetchData] = useFetch("/user/profile");
   const [orders, ordersLoading, ordersError] = useFetch("/order/get-all-order");
 
   const [activeSection, setActiveSection] = useState("profile"); // Default to Profile section
@@ -36,7 +36,7 @@ const ProfilePage = () => {
             <button
               className={`px-4 py-2 rounded-md mt-3 ${
                 activeSection === "profile"
-                  ? "bg-orange-600 text-white"
+                  ? "bg-teal-700 text-white"
                   : "text-gray-600 hover:bg-gray-200"
               }`}
               onClick={() => setActiveSection("profile")}
@@ -49,7 +49,7 @@ const ProfilePage = () => {
             <button
               className={`px-4 py-2 rounded-md ${
                 activeSection === "orders"
-                  ? "bg-orange-600 text-white"
+                  ? "bg-teal-700 text-white"
                   : "text-gray-600 hover:bg-gray-200"
               }`}
               onClick={() => setActiveSection("orders")}
@@ -62,7 +62,7 @@ const ProfilePage = () => {
             <button
               className={`px-4 py-2 rounded-md ${
                 activeSection === "addresses"
-                  ? "bg-orange-600 text-white"
+                  ? "bg-teal-700 text-white"
                   : "text-gray-600 hover:bg-gray-200"
               }`}
               onClick={() => setActiveSection("addresses")}
@@ -83,7 +83,10 @@ const ProfilePage = () => {
         )}
         {activeSection === "addresses" && (
           <div>
-            <SavedAddresses addresses={profile.data.addresses} fetchData={fetchData}/>
+            <SavedAddresses
+              addresses={profile.data.addresses}
+              fetchData={fetchData}
+            />
           </div>
         )}
       </div>

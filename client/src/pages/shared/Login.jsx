@@ -3,14 +3,13 @@ import { axiosInstance } from "../../config/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-
+import Cookies from "js-cookie";
 const Login = ({ isOpen, onClose, onOpenSignUp }) => {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
 
   const user = {
     login_api: "/user/login",
-    profile_route: "/",
     signup_route: { onOpenSignUp },
   };
 
@@ -20,12 +19,11 @@ const Login = ({ isOpen, onClose, onOpenSignUp }) => {
         method: "POST",
         url: user.login_api,
         data,
-        withCredentials: true, // Ensure cookies are sent
       });
-      console.log("response===", response);
-
-      toast.success("Log-in success");
-      window.location.reload();
+      if (Cookies.get("token")) {
+        toast.success("Log-in success");
+        window.location.reload();
+      }
     } catch (error) {
       toast.error("Log-in failed");
       console.log(error);

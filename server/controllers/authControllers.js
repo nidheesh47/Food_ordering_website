@@ -7,7 +7,6 @@ const { generateToken } = require("../utils/token");
 //signup
 exports.signup = async (req, res) => {
   try {
-    console.log("req.body", req.body);
     const { name, email, password, mobile, profilePic, role } = req.body;
 
     if (!name || !email || !password || !mobile) {
@@ -31,7 +30,7 @@ exports.signup = async (req, res) => {
       role,
     });
     await newUser.save();
-    console.log("newUser", newUser);
+
     const token = generateToken(newUser, "user");
     res.cookie("token", token);
 
@@ -62,12 +61,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "invalid credentials" });
     }
     const token = generateToken(userExist, "user");
-    res.cookie("token", token, {
-      httpOnly: process.env.NODE_ENV === "production",
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      // maxAge: 60 * 60 * 1000,
-    });
+    res.cookie("token", token);
 
     res.json({ message: " Login succssfully" });
   } catch (error) {

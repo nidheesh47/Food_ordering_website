@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { FaEdit, FaSave } from "react-icons/fa";
 
-const Account = ({profile}) => {
-      const [isEditing, setIsEditing] = useState(false);
-     const [editableProfile, setEditableProfile] = useState(null);
-     
+const Account = ({ profile }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableProfile, setEditableProfile] = useState(null);
+
   const toggleEdit = () => {
     if (isEditing) {
       // Save logic here
@@ -14,9 +14,9 @@ const Account = ({profile}) => {
       setEditableProfile(profile?.data.profile);
     }
   };
-    const handleChange = (e) => {
-        setEditableProfile({ ...editableProfile, [e.target.name]: e.target.value });
-      };
+  const handleChange = (e) => {
+    setEditableProfile({ ...editableProfile, [e.target.name]: e.target.value });
+  };
 
   return (
     <div>
@@ -29,14 +29,14 @@ const Account = ({profile}) => {
                 name="name"
                 value={editableProfile?.name || ""}
                 onChange={handleChange}
-                className="border border-gray-300 rounded-md px-2 py-1 w-full lg:w-auto focus:outline-orange-600"
+                className="border border-gray-300 rounded-md px-2 py-1 w-full lg:w-auto focus:outline-teal-600"
               />
             ) : (
               profile?.data.profile.name
             )}
           </h1>
           <button
-            className="text-orange-600 hover:text-orange-700"
+            className="text-teal-700 hover:text-teal-800"
             onClick={toggleEdit}
           >
             {isEditing ? <FaSave /> : <FaEdit />}
@@ -49,7 +49,7 @@ const Account = ({profile}) => {
               name="email"
               value={editableProfile?.email || ""}
               onChange={handleChange}
-              className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-orange-600"
+              className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-teal-700"
             />
           ) : (
             profile?.data.profile.email
