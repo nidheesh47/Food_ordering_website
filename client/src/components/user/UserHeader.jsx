@@ -34,7 +34,7 @@ function UserHeader() {
       await axiosInstance({ method: "PUT", url: "user/logout" });
 
       // Properly remove the cookie
-      Cookies.remove("token", { path: "/" });
+      Cookies.remove("token");
 
       toast.success("Logout successfully");
       navigate("/");

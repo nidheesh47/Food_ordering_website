@@ -20,7 +20,6 @@ const Login = ({ isOpen, onClose, onOpenSignUp }) => {
         method: "POST",
         url: user.login_api,
         data,
-        withCredentials: true, // Ensure cookies are sent
       });
       console.log("response===", response);
 
