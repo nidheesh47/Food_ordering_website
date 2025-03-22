@@ -33,11 +33,10 @@ function UserHeader() {
       await axiosInstance({
         method: "POST", // ✅ Use POST instead of PUT
         url: "user/logout",
-        withCredentials: true, // ✅ Ensures cookies are included in the request
       });
 
       toast.success("Logout successfully");
-      navigate("/"); // ✅ Redirect after logout
+      navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
       toast.error("Logout failed");
