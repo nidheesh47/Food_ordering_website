@@ -12,7 +12,6 @@ import { FaCartShopping } from "react-icons/fa6";
 import { FaUserCircle } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../config/axiosInstance";
-import Cookies from "js-cookie";
 
 import toast from "react-hot-toast";
 
@@ -31,15 +30,17 @@ function UserHeader() {
 
   const userLogout = async () => {
     try {
-      await axiosInstance({ method: "PUT", url: "user/logout" });
-
-      // Properly remove the cookie
-      Cookies.remove("token");
+      await axiosInstance({
+        method: "POST", // ✅ Use POST instead of PUT
+        url: "user/logout",
+        withCredentials: true, // ✅ Ensures cookies are included in the request
+      });
 
       toast.success("Logout successfully");
-      navigate("/");
+      navigate("/"); // ✅ Redirect after logout
     } catch (error) {
-      console.error(error);
+      console.error("Logout failed:", error);
+      toast.error("Logout failed");
     }
   };
 

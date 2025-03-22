@@ -19,7 +19,7 @@ router.post("/login", login);
 router.get("/profile", authMiddleware, getProfile);
 router.put("/rest-password", authMiddleware, resetPassword);
 
-router.put("/logout", logout);
+router.post("/logout", logout);
 router.put("/update-Profile", authMiddleware, profileUpdate);
 router.delete("/delete-account", authMiddleware, deleteUserAccount);
 
